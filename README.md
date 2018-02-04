@@ -30,7 +30,7 @@ TODO  一个spark sql工具，虽然有了hive sql工具，不过我还是希望
 
 **保存功能**
 
-- 保存到hdfs文本结构化数据，支持保存的分隔符
+- 保存到hdfs文本结构化数据，能支持保存的分隔符
 - 支持压缩
 - 支持保存为paquarty
 - 支持输出到控制台
@@ -53,4 +53,4 @@ TODO  一个spark sql工具，虽然有了hive sql工具，不过我还是希望
 
 在启动spark-sql时，如果不指定master，则以local的方式运行，master既可以指定standalone的地址，也可以指定yarn；  
 
-具体代码： 还有点小bug，先暂不放出来
+具体代码： 还有点小bug，先暂不放出来, 2月底放出来吧
