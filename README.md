@@ -10,9 +10,9 @@ TODO  一个spark sql工具，虽然有了hive sql工具，不过我还是希望
 **读数据**  
 
 本地：  
-- hdfs结构化数据
-- hive的数据
-- json数据
+- hdfs 结构化数据
+- hive 的数据
+- json 数据
 - csv
 
 **hdfs：** 
