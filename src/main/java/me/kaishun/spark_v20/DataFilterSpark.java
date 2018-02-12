@@ -5,6 +5,7 @@ import java.util.List;
 
 import me.kaishun.spark_main.FieldAttr;
 import me.kaishun.spark_main.FormModel;
+import me.kaishun.spark_main.SparkConfUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
@@ -35,27 +36,7 @@ public class DataFilterSpark {
 			return;
 		}
 
-		//	    System.setProperty("hadoop.home.dir", "E:\\hadoop\\hadoop-2.7.1");
-//		SparkConf sparkConf = new SparkConf().setAppName("JavaSparkSQL")
-//				.set("yarn.nodemanager.resource.memory-mb", "8192")
-//				.set("yarn.scheduler.maximum-allocation-mb", "8192")
-//				.set("spark.driver.maxResultSize", "4g")
-//				.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-//	    JavaSparkContext ctx = new JavaSparkContext(sparkConf);
-//	    SQLContext sqlContext = new SQLContext(ctx);
-		SparkSession spark = SparkSession
-				.builder()
-				.appName("DataFilter").master("local")
-				.getOrCreate();
-//	    	      .config("yarn.nodemanager.resource.memory-mb", "8192")
-//	    	      .config("yarn.scheduler.maximum-allocation-mb", "8192")
-//	    	      .config("spark.driver.maxResultSize", "4g")
-//	    	      .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-//	    	      .master("local") //写成可配置的
-
-		// 设置log级别
-		SparkContext sc = spark.sparkContext();
-		sc.setLogLevel("WARN");
+		SparkSession spark = SparkConfUtil.getSparkSession();
 
 
 		// 加载几种表结构
