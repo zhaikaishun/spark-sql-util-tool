@@ -66,55 +66,11 @@ public class FilterReadFromXml {
 
 	/**
 	 * @paramW
-	 * @return an String[] String[0] is field, String[1] is sttribute
+	 * @return 返回一个 模板表FormModel
+	 * @see FormModel
 	 * @throws DocumentException
 	 */
-	public String[] getFieldAndAttr1(String tablename) throws DocumentException {
-		// Initialize table field
-		String fieldString = "";
-		// Initialize table attribute
-		String attrString = "";
-		// Initialize the split sign
-		String splitsignString = "";
-
-		String[] tableFieldAndAttr = null;
-
-		SAXReader reader = new SAXReader();
-		Document document = reader.read(new File(configPath));
-
-		String xpath = "//tables//table[@tablename='" + tablename
-				+ "']//fieldname";
-		List<Element> list = document.selectNodes(xpath); // 之前是string的，后面.next强转了，我修改后这里不知道会不会报错
-
-		Iterator<Element> iter = list.iterator();
-		while (iter.hasNext()) {
-			Element element = iter.next();// (Element) iter.next();
-			// connect the field
-			fieldString = fieldString + element.attribute(0).getValue() + " ";
-			// connect the attribute
-			attrString = attrString + element.attribute(1).getValue() + " ";
-		}
-		// remove the last character
-		fieldString = fieldString.substring(0, fieldString.length() - 1);
-		attrString = attrString.substring(0, attrString.length() - 1);
-
-		String xpathSplit = "//tables//table[@tablename='" + tablename
-				+ "']//splitsign";
-		List<Element> signlist = document.selectNodes(xpathSplit);
-		Iterator<Element> splititer = signlist.iterator();
-		while (splititer.hasNext()) {
-			Element splitElement = splititer.next(); //(Element) 
-			splitsignString = splitsignString
-					+ splitElement.attribute(0).getValue();
-		}
-
-		tableFieldAndAttr = new String[] { fieldString, attrString,
-				splitsignString };
-		return tableFieldAndAttr;
-
-	}
-
-	public FormModel getFieldAndAttr(String tablename) throws DocumentException {
+	public FormModel getFormModelFromTableName(String tablename) throws DocumentException {
 
 		FormModel formModel = new FormModel();
 

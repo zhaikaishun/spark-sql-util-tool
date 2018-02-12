@@ -17,7 +17,7 @@ public class MainForm  implements java.io.Serializable{
         try {
             ArrayList<FormModel> formModelLists = new ArrayList<>();
             for (String tableName : tableNames) {
-                FormModel formModel = filterReadFromXml.getFieldAndAttr(tableName);
+                FormModel formModel = filterReadFromXml.getFormModelFromTableName(tableName);
                 formModelLists.add(formModel);
             }
 
