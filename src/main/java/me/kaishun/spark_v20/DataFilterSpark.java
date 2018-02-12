@@ -39,12 +39,13 @@ public class DataFilterSpark {
 		SparkSession spark = SparkConfUtil.getSparkSession();
 
 
-		// 加载几种表结构
+		/* 加载所有的表结构 */
 		DataTypUtils dataTypUtils = new DataTypUtils();
 		for (FormModel formModel:formModelLists) {
 			dataTypUtils.transformDataTypeUtils(formModel);
 			JavaRDD<String> people = spark.read().textFile(formModel.inputPath).javaRDD();
 			List<StructField> fields = new ArrayList<StructField>();
+			// 最大分割数，因为有的数据不需要分割那么多
 			int maxSplitNum=0;
 			for(FieldAttr fieldAttr:formModel.fieldAttrArrayList){
 				fields.add(DataTypes.createStructField(fieldAttr.fieldName, fieldAttr.sparkAttr, true));
@@ -53,14 +54,16 @@ public class DataFilterSpark {
 				}
 
 			}
+			// sparkSql 注册表结构
 			StructType schema = DataTypes.createStructType(fields);
 			final String string = FieldSplitSign;
+			//最大分割数final一下
 			final int maxClosePackageSplitNum =  maxSplitNum;
+			/* 根据表结构加载数据 */
 			JavaRDD<Row> rowRDD = people.map(
 					new Function<String, Row>() {
 						public Row call(String record) throws Exception {
 							String[] splits = record.split(string,maxClosePackageSplitNum+2);
-							//TODO maybe cause the memory leak
 							Object[] objeck = new Object[splits.length];
 							if(splits.length<=formModel.fieldAttrArrayList.size()){
 								for(int i=0;i<formModel.fieldAttrArrayList.size();i++){
@@ -72,9 +75,10 @@ public class DataFilterSpark {
 							return RowFactory.create(objeck);
 						}
 					});
+			// 根据表数据和表结构，注册DataSet
 			Dataset<Row> peopleDataFrame = spark.createDataFrame(rowRDD, schema);
+			// 给这种数据添加一个表名
 			peopleDataFrame.createOrReplaceTempView(formModel.tableName);
-
 		}
 
 
