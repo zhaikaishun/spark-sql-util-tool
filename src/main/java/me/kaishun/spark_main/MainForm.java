@@ -22,7 +22,6 @@ public class MainForm  implements java.io.Serializable{
                 formModelLists.add(formModel);
             }
 
-
             DataFilterSpark dataFilterSpark = new DataFilterSpark();
             // spark sql核心代码
             dataFilterSpark.doSpark(formModelLists,args);

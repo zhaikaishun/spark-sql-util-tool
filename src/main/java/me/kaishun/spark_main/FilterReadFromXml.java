@@ -20,25 +20,6 @@ import org.dom4j.io.SAXReader;
 @SuppressWarnings("unchecked")
 public class FilterReadFromXml {
 	private String configPath = "conf/people.xml";
-
-	public ArrayList<String> getTableName1() throws DocumentException {
-		ArrayList<String> tableNameArray = new ArrayList<String>();
-
-		SAXReader reader = new SAXReader();
-
-		Document document = reader.read(new File(configPath));
-
-		String xpathtable = "//tables//table";
-		List<String> list = document.selectNodes(xpathtable);
-		Iterator iter = list.iterator();
-		while (iter.hasNext()) {
-			Element element = (Element) iter.next();
-			tableNameArray.add(element.attribute(0).getValue());
-
-		}
-		return tableNameArray;
-	}
-
 	/**
 	 *
 	 * @return 返回conf_table下的文件名，去掉xml，此文件名将会作为数据库表名
