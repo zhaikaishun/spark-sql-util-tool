@@ -39,6 +39,10 @@ public class FilterReadFromXml {
 		return tableNameArray;
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	public ArrayList<String> getTableName() {
 		String path = "conf_table"; // 路径
 		File f = new File(path);
