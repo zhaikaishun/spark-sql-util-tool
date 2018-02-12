@@ -3,10 +3,15 @@ package me.kaishun.spark_main;
 import java.util.ArrayList;
 
 public class FormModel implements java.io.Serializable{
+    // 数据存放路径
     public String inputPath;
+    //表名
     public String tableName;
+    //数据库分隔符
     public String splitSign;
+
     public String splitOutSign;
+    // 字段和属性的list
     public ArrayList<FieldAttr> fieldAttrArrayList;
 
     public FormModel() {

@@ -78,8 +78,8 @@ public class FilterReadFromXml {
 		configPath = "conf_table/" + tablename + ".xml";
 		Document document = reader.read(new File(configPath));
 
-		// String xpath =
-		// "//tables//table[@tablename='"+tablename+"']//fieldname";
+
+		/* 举例 <fieldname fieldname="userID" type="string" pos="1"/>  */
 		String xpath = "//table//fieldname";
 		List<String> list = document.selectNodes(xpath);
 		Iterator iter = list.iterator();
