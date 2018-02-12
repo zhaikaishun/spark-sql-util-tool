@@ -41,7 +41,7 @@ public class FilterReadFromXml {
 
 	/**
 	 *
-	 * @return
+	 * @return 返回conf_table下的文件名，去掉xml，此文件名将会作为数据库表名
 	 */
 	public ArrayList<String> getTableName() {
 		String path = "conf_table"; // 路径
