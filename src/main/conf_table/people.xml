@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+  <!-- 
+
+    -->
+<table>
+		<fieldname fieldname="name" type="string"/>
+		<fieldname fieldname="age" type="int"/>
+		<splitsign rule=",">splitsdd</splitsign>
+		<inputPath>F:\sparksqlutil\resources\people.txt</inputPath>
+</table>
