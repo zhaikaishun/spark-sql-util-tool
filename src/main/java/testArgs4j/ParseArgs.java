@@ -8,7 +8,7 @@ public class ParseArgs implements java.io.Serializable {
     public String outputPath="";
 
     @Option(name="-outputType",usage="txt,csv,qually,or other")
-    public String outputType="";
+    public String outputType="txt";
 
     @Option(name="-outputSplit",usage="the outputsplit, " +
             "if assign,move the success")

@@ -35,6 +35,7 @@ public class DataFilterSpark {
 			System.out.println("args is 0");
 			return;
 		}
+		pars.parseArgument(args);
 
 		SparkSession spark = SparkConfUtil.getSparkSession();
 
@@ -68,7 +69,7 @@ public class DataFilterSpark {
 							if(splits.length<=formModel.fieldAttrArrayList.size()){
 								for(int i=0;i<formModel.fieldAttrArrayList.size();i++){
 									FieldAttr eachFieldAttr = formModel.fieldAttrArrayList.get(i);
-									objeck[i] = dataTypUtils.arrtToObject(splits[eachFieldAttr.posIndex].trim(),
+									objeck[i] = dataTypUtils.arrtToObject(splits[eachFieldAttr.posIndex-1].trim(),
 											eachFieldAttr.attribute);
 								}
 							}
@@ -80,9 +81,7 @@ public class DataFilterSpark {
 			// 给这种数据添加一个表名
 			peopleDataFrame.createOrReplaceTempView(formModel.tableName);
 		}
-
-
-//	    String sqlCondition = "select * from "+tablenamestr+" where "+args[2];
+		// 测试一下
 	    String sqlCondition = "select * from teacher";
 	    Dataset<Row> results = spark.sql(sqlCondition);
 	    results.show();
@@ -92,13 +91,14 @@ public class DataFilterSpark {
 				"student on teacher.studentID = student.userID");
 		innerJoin.show();
 
-		if(parseArgs.outputType.toUpperCase().contains("text")){
+		System.out.println("parseArgs.outputPath: "+parseArgs.outputPath);
+
+		if(parseArgs.outputType.toUpperCase().contains("TXT")){
 			JavaRDD<Row> javaRDD = results.toJavaRDD();
 			//将前后的中括号去掉, 然后保存到指定路径
 			javaRDD.flatMap(new FlatMapFunction<Row, String>() {
 				@Override
 				public Iterator<String> call(Row row) throws Exception {
-					//北京需求
 					String str = row.toString().trim().
 							substring(1,row.toString().length()-1).replaceAll(",", parseArgs.outputSplit);
 					ArrayList<String> arrayList = new ArrayList<String>();
