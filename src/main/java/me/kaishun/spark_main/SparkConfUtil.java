@@ -8,7 +8,8 @@ import org.apache.spark.sql.SparkSession;
 
 public class SparkConfUtil {
     public static SparkSession getSparkSession() {
-        System.setProperty("hadoop.home.dir", "D:\\hadoop-2.7.2");
+    	// TODO 本地测试需要修改
+        System.setProperty("hadoop.home.dir", "D:\\softdownload\\install_package\\hadoop-2.7.1");
 //        SparkConf sparkConf = new SparkConf().setAppName("JavaSparkSQL");
 //                .set("yarn.nodemanager.resource.memory-mb", "8192")
 //                .set("yarn.scheduler.maximum-allocation-mb", "8192")
