@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>SparkSqlTools</groupId>
-    <artifactId>me.kaishun</artifactId>
+    <groupId>me.kaishun</groupId>
+    <artifactId>spark-sql-util-tool</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -77,6 +77,11 @@
             <artifactId>args4j</artifactId>
             <version>2.33</version>
         </dependency>
+        <dependency>
+    		<groupId>jline</groupId>
+    		<artifactId>jline</artifactId>
+    		<version>2.14.5</version>
+		</dependency>
 
     </dependencies>
 

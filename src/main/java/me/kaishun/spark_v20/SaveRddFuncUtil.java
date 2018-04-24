@@ -19,27 +19,27 @@ public class SaveRddFuncUtil {
 	 * @param spark
 	 * @param results
 	 */
-	public static void saveAsTextFile(ParseArgs parseArgs, SparkSession spark, Dataset<Row> results) {
+	public static void saveAsTextFile(String path,String splitSng, SparkSession spark, Dataset<Row> results) {
 		JavaRDD<Row> javaRDD = results.toJavaRDD();
 		//将前后的中括号去掉, 然后保存到指定路径
 		javaRDD.flatMap(new FlatMapFunction<Row, String>() {
 			@Override
 			public Iterator<String> call(Row row) throws Exception {
 				String str = row.toString().trim().
-						substring(1,row.toString().length()-1).replaceAll(",", parseArgs.outputSplit);
+						substring(1,row.toString().length()-1).replaceAll(",", splitSng);
 				ArrayList<String> arrayList = new ArrayList<String>();
 				arrayList.add(str);
 				return arrayList.iterator();
 			}
-		}).saveAsTextFile(parseArgs.outputPath);
-		spark.stop();
+		}).saveAsTextFile(path);
+//		spark.stop();
 	}
 	
-	public static void saveAsQuality(ParseArgs parseArgs, SparkSession spark, Dataset<Row> results){
+	public static void saveAsQuality(String path, SparkSession spark, Dataset<Row> results){
 		
 	}
 	
-	public static void saveToHive(ParseArgs parseArgs, SparkSession spark, Dataset<Row> results){
+	public static void saveToHive(String path, SparkSession spark, Dataset<Row> results){
 		
 	}
 }
