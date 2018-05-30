@@ -6,6 +6,7 @@ import java.util.Date;
 //import org.apache.mina.util.byteaccess.IoAbsoluteReader;
 import me.kaishun.spark_main.FieldAttr;
 import me.kaishun.spark_main.FormModel;
+import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 //import org.junit.Test;
 
@@ -33,7 +34,13 @@ public class DataTypUtils implements java.io.Serializable {
 		
 		switch(fieldAttr.attribute.toLowerCase()){
 		case "short" :
-			fieldAttr.sparkAttr = DataTypes.StringType;
+			fieldAttr.sparkAttr = DataTypes.ShortType;
+			break;
+		case "smallint" :
+			fieldAttr.sparkAttr = DataTypes.ShortType;
+			break;
+		case "tinyint" :
+			fieldAttr.sparkAttr = DataTypes.IntegerType;
 			break;
 		case "char" :
 			fieldAttr.sparkAttr = DataTypes.StringType;
