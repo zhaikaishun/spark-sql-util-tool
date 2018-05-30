@@ -73,20 +73,20 @@ public class DataFilterSpark {
                 String saveType = reader.readLine("spark sql type> ");
                 Dataset<Row> results = spark.sql(sqlCondition);
 
-                if (saveType.toUpperCase().contains("saveAsText")) {
+                if (saveType.toLowerCase().contains("saveastext")) {
                     System.out.println("请输入路径保存");
                     String savePath = reader.readLine("spark sql savePath> ");
                     System.out.println("请输入保存的分割符号");
                     String splitSng = reader.readLine("spark sql splitSng> ");
                     SaveRddFuncUtil.saveAsTextFile(savePath,splitSng, spark, results);
                 }
-                if (saveType.toUpperCase().contains("saveAsParquet")) {
+                if (saveType.toLowerCase().contains("saveasparquet")) {
                     SaveRddFuncUtil.saveAsQuality("path", spark, results);
                 }
-                if (saveType.toUpperCase().contains("saveToHive")) {
+                if (saveType.toLowerCase().contains("savetohive")) {
                     SaveRddFuncUtil.saveToHive("path", spark, results);
                 }
-                if (saveType.toUpperCase().contains("SHOW")) {
+                if (saveType.toLowerCase().contains("show")) {
                     results.show();
                 }
 
