@@ -20,7 +20,14 @@ public class DataFilterSpark {
         public static void doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
             String FieldSplitSign = ",";
             SparkConf sparkConf = new SparkConf();
-            sparkConf.setAppName("spark-sql").setMaster("local");
+
+            String os = System.getProperty("os.name");
+            if(os.toLowerCase().startsWith("win")){
+                sparkConf.setAppName("spark-sql").setMaster("local");
+            }else{
+                sparkConf.setAppName("spark-sql");
+            }
+
             final JavaSparkContext ctx = new JavaSparkContext(sparkConf);
             final SQLContext sqlContext = new SQLContext(ctx);
             /* 加载所有的表结构 */
