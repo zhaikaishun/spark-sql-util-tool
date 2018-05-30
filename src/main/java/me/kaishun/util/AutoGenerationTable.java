@@ -1,11 +1,14 @@
 package me.kaishun.util;
 
 import java.io.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 public class AutoGenerationTable {
     public static void main(String[] args) {
         //文本的那些转table
-        createTableByFile();
+//        createTableByFile();
         // hive转table
         createTableByHive();
         // sqlserver转table
@@ -15,6 +18,52 @@ public class AutoGenerationTable {
     }
 
     private static void creteTableByMysql() {
+        String xmlValue = "";
+        xmlValue += createXmlHeard();
+
+        DBHelper dbHelper = new DBHelper();
+        dbHelper.setDBValue("root","root","111.230.28.12","STUDENT",32768);
+        dbHelper.GetConn();
+        String sql = "show create table STUDENT";
+        ResultSet rs = dbHelper.GetResultSet(sql);
+        StringBuffer bodyBuffer = new StringBuffer();
+        try {
+            while (rs.next()){
+                String result = rs.getString(2);
+                System.out.println(result);
+                String[] split = result.split("\n");
+                int pos = -1;
+                for (String s : split) {
+                    if(s.contains("(") && pos==-1){
+                        //开始
+                        pos = 1;
+                        continue;
+                    }
+                    if(s.contains("=")){
+                        //结束
+                        break;
+                    }
+                    if(pos>0){
+                        String line = s.replace("`", "");
+                        int kuohaoIndex = line.indexOf("(");
+                        int end = kuohaoIndex>0?kuohaoIndex:line.length();
+                        String fieldAndAttrStr = line.substring(0, end);
+                        String[] fieldAndAttrArray = fieldAndAttrStr.trim().split(" ");
+                        String field = fieldAndAttrArray[0].trim();
+                        String attr = fieldAndAttrArray[1].trim();
+                        createXmlBody(bodyBuffer,field,attr,pos);
+                        pos++;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            dbHelper.CloseConn();
+        }
+        xmlValue+=bodyBuffer.toString();
+        xmlValue+=createXmlEnd();
+        System.out.println(xmlValue);
 
     }
 
@@ -96,7 +145,10 @@ public class AutoGenerationTable {
         return field;
     }
     private static String createXmlEnd(){
-        return "</table>";
+        String result = "    <splitsign></splitsign>"+"\n";
+        result +="    <inputPath></inputPath>"+"\n";
+        result +="</table>";
+        return result;
     }
 
     public static void saveToFile(String path,String value){
