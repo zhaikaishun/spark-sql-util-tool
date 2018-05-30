@@ -7,5 +7,5 @@
 		<fieldname fieldname="name" type="string" pos="2"/>
 		<fieldname fieldname="age" type="int" pos="3"/>
 		<splitsign>,</splitsign>
-		<inputPath>data_path\student.txt</inputPath>
+		<inputPath>hdfs://192.168.1.31:9000/tmp/zks1/student.txt</inputPath>
 </table>

@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="me.kaishun" />
+        <module name="spark-sql-util-tool" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="me.kaishun" target="1.8" />
+      <module name="spark-sql-util-tool" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

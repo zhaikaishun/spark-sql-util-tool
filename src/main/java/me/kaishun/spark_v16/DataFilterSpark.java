@@ -1,117 +1,104 @@
 package me.kaishun.spark_v16;
 
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//import org.apache.spark.SparkConf;
-//import org.apache.spark.api.java.JavaRDD;
-//import org.apache.spark.api.java.JavaSparkContext;
-//import org.apache.spark.api.java.function.FlatMapFunction;
-//import org.apache.spark.api.java.function.Function;
-//import org.apache.spark.api.java.function.VoidFunction;
-////import org.apache.spark.sql.DataFrame;
-//import org.apache.spark.sql.Row;
-//import org.apache.spark.sql.RowFactory;
-//import org.apache.spark.sql.SQLContext;
-//import org.apache.spark.sql.types.DataType;
-//import org.apache.spark.sql.types.DataTypes;
-//import org.apache.spark.sql.types.StructField;
-//import org.apache.spark.sql.types.StructType;
-//
-//import breeze.signal.fourierShift;
+import jline.console.ConsoleReader;
+import me.kaishun.spark_main.FieldAttr;
+import me.kaishun.spark_main.FormModel;
+import me.kaishun.spark_v20.DataTypUtils;
+import me.kaishun.spark_v20.SaveRddFuncUtil;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataFilterSpark {
-//	public static void main(String[] args) throws Exception {
-//		String FieldSplitSign = " ";
-//		String tableField = "";
-//		String tableAttr = "";
-//		String tablenamestr = "";
-//		if (args.length != 4) {
-//			System.err.println("Usage: JavaWordCount <file>");
-//			System.exit(1);
-//		}
-//		String[] strings = args[0].split("&");
-//		tablenamestr = strings[0];
-//		tableField = strings[1];
-//		tableAttr = strings[2];
-//		FieldSplitSign = strings[3];
-//		final String[] fieldAttyList = tableAttr.split("#");
-//
-//		System.setProperty("hadoop.home.dir", "D:\\hadoop\\hadoop-2.7.1");
-//		SparkConf sparkConf = new SparkConf().setAppName("JavaSparkSQL")
-//				.setMaster("local");
-//		// .set("yarn.nodemanager.resource.memory-mb", "8192")
-//		// .set("yarn.scheduler.maximum-allocation-mb", "8192")
-//		// .set("spark.driver.maxResultSize", "4g")
-//		// .set("spark.serializer",
-//		// "org.apache.spark.serializer.KryoSerializer");
-//		JavaSparkContext ctx = new JavaSparkContext(sparkConf);
-//		ctx.setLogLevel("WARN");
-//		SQLContext sqlContext = new SQLContext(ctx);
-//
-//		JavaRDD<String> people = ctx.textFile(args[1]);
-//
-//		String schemaString = tableField;
-//		final DataTypUtils dataTypUtils = new DataTypUtils();
-//		DataType[] dataTypesList = dataTypUtils
-//				.transformDataTypeUtils(tableAttr);
-//		List<StructField> fields = new ArrayList<StructField>();
-//		String[] schemaList = schemaString.split("#");
-//		final String[] schemaList1 = schemaList;
-//
-//		for (int i = 0; i < schemaList.length; i++) {
-//			fields.add(DataTypes.createStructField(schemaList[i],
-//					dataTypesList[i], true));
-//
-//		}
-//
-//		final String string = FieldSplitSign;
-//		StructType schema = DataTypes.createStructType(fields);
-//
-//		JavaRDD<Row> rowRDD = people.map(new Function<String, Row>() {
-//			public Row call(String record) throws Exception {
-//				String[] fields = record.split(string);
-//				// TODO maybe cause the memory leak
-//
-//				Object[] objeck = new Object[fields.length];
-//
-//				// if(fields.length!=schemaList1.length){
-//				// objeck = new Object[schemaList1.length];
-//				// }
-//				// else{
-//				// for(int i=0;i<fields.length;i++){
-//				// objeck[i] =
-//				// dataTypUtils.arrtToObject(fields[i].trim(),fieldAttyList[i].trim());
-//				// }
-//				// }
-//				if (fields.length <= schemaList1.length) {
-//					for (int i = 0; i < fields.length; i++) {
-//						objeck[i] = dataTypUtils.arrtToObject(fields[i].trim(),
-//								fieldAttyList[i].trim());
-//					}
-//				}
-//				return RowFactory.create(objeck);
-//			}
-//		});
-//
-//		DataFrame peopleDataFrame = sqlContext.createDataFrame(rowRDD, schema);
-//		peopleDataFrame.registerTempTable(tablenamestr);
-//
-//		String sqlCondition = "select * from " + tablenamestr + " where "
-//				+ args[2];
-//		DataFrame results = sqlContext.sql(sqlCondition);
-//		JavaRDD<Row> javaRDD = results.toJavaRDD();
-//		// ��ǰ���������ȥ��, Ȼ�󱣴浽ָ��·��
-//		javaRDD.flatMap(new FlatMapFunction<Row, String>() {
-//			@Override
-//			public Iterable<String> call(Row row) throws Exception {
-//				String str = row.toString().trim()
-//						.substring(1, row.toString().length() - 1);
-//				ArrayList<String> arrayList = new ArrayList<String>();
-//				arrayList.add(str);
-//				return arrayList;
-//			}
-//		}).saveAsTextFile(args[3]);
-//		ctx.stop();
-//	}
+    public static void doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
+
+        String FieldSplitSign = ",";
+        SparkConf sparkConf = new SparkConf();
+        sparkConf.setAppName("spark-sql").setMaster("local");
+        final JavaSparkContext ctx = new JavaSparkContext(sparkConf);
+        final SQLContext sqlContext = new SQLContext(ctx);
+		/* 加载所有的表结构 */
+        final DataTypUtils dataTypUtils = new DataTypUtils();
+        for (final FormModel formModel : formModelLists) {
+            dataTypUtils.transformDataTypeUtils(formModel);
+            JavaRDD<String> people = ctx.textFile(formModel.inputPath);
+            List<StructField> fields = new ArrayList<StructField>();
+            // 最大分割数，因为有的数据不需要分割那么多
+            int maxSplitNum = 0;
+            for (FieldAttr fieldAttr : formModel.fieldAttrArrayList) {
+                fields.add(DataTypes.createStructField(fieldAttr.fieldName, fieldAttr.sparkAttr, true));
+                if (fieldAttr.posIndex > maxSplitNum) {
+                    maxSplitNum = fieldAttr.posIndex;
+                }
+
+            }
+            // sparkSql 注册表结构
+            StructType schema = DataTypes.createStructType(fields);
+            final String splitsign = FieldSplitSign;
+            // 最大分割数final一下
+            final int maxClosePackageSplitNum = maxSplitNum;
+			/* 根据表结构加载数据 */
+            JavaRDD<Row> rowRDD = people.map(new Function<String, Row>() {
+                public Row call(String record) throws Exception {
+                    String[] splits = record.split(splitsign, maxClosePackageSplitNum + 2);
+                    Object[] objeck = new Object[splits.length];
+                    if (splits.length <= formModel.fieldAttrArrayList.size()) {
+                        for (int i = 0; i < formModel.fieldAttrArrayList.size(); i++) {
+                            FieldAttr eachFieldAttr = formModel.fieldAttrArrayList.get(i);
+                            objeck[i] = dataTypUtils.arrtToObject(splits[eachFieldAttr.posIndex - 1].trim(),
+                                    eachFieldAttr.attribute);
+                        }
+                    }
+                    return RowFactory.create(objeck);
+                }
+            });
+            // 根据表数据和表结构，注册DataSet
+            DataFrame dataFrame = sqlContext.createDataFrame(rowRDD, schema);
+            // 给这种数据添加一个表名
+            dataFrame.registerTempTable(formModel.tableName);
+        }
+        // 注意，如果是eclipse等IDE测试，需要在VM中加  -Djline.terminal=jline.UnsupportedTerminal
+        ConsoleReader reader = new ConsoleReader();
+        while(true){
+            System.out.println("请输入sql");
+            String sqlCondition = reader.readLine("spark-sql sql> ");
+            if(sqlCondition.endsWith(";")){
+                sqlCondition = sqlCondition.substring(0, sqlCondition.length() - 1);
+            }
+            System.out.println("请输入保存方式: show, saveAsText, saveToHive, saveAsParquet");
+            String saveType = reader.readLine("spark sql type> ");
+            DataFrame results = sqlContext.sql(sqlCondition);
+
+            if (saveType.toUpperCase().contains("saveAsText")) {
+                System.out.println("请输入路径保存");
+                String savePath = reader.readLine("spark sql savePath> ");
+                System.out.println("请输入保存的分割符号");
+                String splitSng = reader.readLine("spark sql splitSng> ");
+                SaveRddFuncUtil.saveAsTextFile(savePath,splitSng, results);
+            }
+            if (saveType.toUpperCase().contains("saveAsParquet")) {
+//                SaveRddFuncUtil.saveAsParquet("path", spark, results);
+            }
+            if (saveType.toUpperCase().contains("saveToHive")) {
+//                SaveRddFuncUtil.saveToHive("path", spark, results);
+            }
+            if (saveType.toUpperCase().contains("SHOW")) {
+                results.show();
+            }
+
+        }
+
+    }
+
 }

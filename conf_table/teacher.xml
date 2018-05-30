@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+  <!-- 
+
+    -->
+<table>
+		<fieldname fieldname="name" type="string" pos="1"/>
+		<fieldname fieldname="age" type="int" pos="2"/>
+		<fieldname fieldname="studentID" type="string" pos="3"/>
+		<splitsign>,</splitsign>
+		<inputPath>hdfs://192.168.1.31:9000/tmp/zks1/teacher.txt</inputPath>
+</table>

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/me.kaishun.iml" filepath="$PROJECT_DIR$/me.kaishun.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spark-sql-util-tool.iml" filepath="$PROJECT_DIR$/spark-sql-util-tool.iml" />
     </modules>
   </component>
 </project>
