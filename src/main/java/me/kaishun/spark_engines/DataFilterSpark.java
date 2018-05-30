@@ -2,14 +2,13 @@ package me.kaishun.spark_engines;
 import jline.console.ConsoleReader;
 import me.kaishun.spark_main.FieldAttr;
 import me.kaishun.spark_main.FormModel;
-import org.apache.spark.SparkConf;
+import me.kaishun.spark_main.SparkConfUtil;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
-import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
@@ -19,15 +18,14 @@ public class DataFilterSpark {
 
         public static void doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
             String FieldSplitSign = ",";
-            SparkConf sparkConf = new SparkConf();
-            sparkConf.setAppName("spark-sql").setMaster("local");
-            final JavaSparkContext ctx = new JavaSparkContext(sparkConf);
-            final SQLContext sqlContext = new SQLContext(ctx);
+
+            SparkSession spark = SparkConfUtil.getSparkSession();
+
             /* 加载所有的表结构 */
             final DataTypUtils dataTypUtils = new DataTypUtils();
             for (final FormModel formModel : formModelLists) {
                 dataTypUtils.transformDataTypeUtils(formModel);
-                JavaRDD<String> people = ctx.textFile(formModel.inputPath);
+                JavaRDD<String> people = spark.read().textFile(formModel.inputPath).javaRDD();
                 List<StructField> fields = new ArrayList<StructField>();
                 // 最大分割数，因为有的数据不需要分割那么多
                 int maxSplitNum = 0;
@@ -59,9 +57,9 @@ public class DataFilterSpark {
                     }
                 });
                 // 根据表数据和表结构，注册DataSet
-                DataFrame dataFrame = sqlContext.createDataFrame(rowRDD, schema);
+                Dataset<Row> dataFrame = spark.createDataFrame(rowRDD, schema);
                 // 给这种数据添加一个表名
-                dataFrame.registerTempTable(formModel.tableName);
+                dataFrame.createOrReplaceTempView(formModel.tableName);
             }
             // 注意，如果是eclipse等IDE测试，需要在VM中加  -Djline.terminal=jline.UnsupportedTerminal
             ConsoleReader reader = new ConsoleReader();
@@ -73,20 +71,20 @@ public class DataFilterSpark {
                 }
                 System.out.println("请输入保存方式: show, saveAsText, saveToHive, saveAsParquet");
                 String saveType = reader.readLine("spark sql type> ");
-                DataFrame results = sqlContext.sql(sqlCondition);
+                Dataset<Row> results = spark.sql(sqlCondition);
 
                 if (saveType.toUpperCase().contains("saveAsText")) {
                     System.out.println("请输入路径保存");
                     String savePath = reader.readLine("spark sql savePath> ");
                     System.out.println("请输入保存的分割符号");
                     String splitSng = reader.readLine("spark sql splitSng> ");
-                    SaveRddFuncUtil.saveAsTextFile(savePath,splitSng, results);
+                    SaveRddFuncUtil.saveAsTextFile(savePath,splitSng, spark, results);
                 }
                 if (saveType.toUpperCase().contains("saveAsParquet")) {
-    //                SaveRddFuncUtil.saveAsParquet("path", spark, results);
+                    SaveRddFuncUtil.saveAsQuality("path", spark, results);
                 }
                 if (saveType.toUpperCase().contains("saveToHive")) {
-    //                SaveRddFuncUtil.saveToHive("path", spark, results);
+                    SaveRddFuncUtil.saveToHive("path", spark, results);
                 }
                 if (saveType.toUpperCase().contains("SHOW")) {
                     results.show();
