@@ -1,4 +1,4 @@
-package me.kaishun.spark_v20;
+package me.kaishun.spark_engines;
 
 import java.util.Date;
 
@@ -6,7 +6,6 @@ import java.util.Date;
 //import org.apache.mina.util.byteaccess.IoAbsoluteReader;
 import me.kaishun.spark_main.FieldAttr;
 import me.kaishun.spark_main.FormModel;
-import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 //import org.junit.Test;
 

@@ -1,7 +1,6 @@
-package me.kaishun.spark_v20;
+package me.kaishun.spark_engines;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
