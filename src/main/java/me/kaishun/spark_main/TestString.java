@@ -6,6 +6,7 @@ import java.io.IOException;
 
 public class TestString {
     public static void main(String[] args) throws IOException {
+        System.out.println(System.getProperty("os.name"));
         ConsoleReader reader = new ConsoleReader();
         while(true){
             System.out.println("请输入sql");
