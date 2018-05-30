@@ -1,3 +1,0 @@
-001,kaishun,17
-003,yuchang,16
-002,laoxie,17
