@@ -20,8 +20,6 @@ public class DataFilterSpark {
             String FieldSplitSign = ",";
 
             SparkSession spark = SparkConfUtil.getSparkSession();
-            spark.sql("SELECT * FROM default.tb_high1 LIMIT 10").show();
-            System.exit(0);
             /* 加载所有的表结构 */
             final DataTypUtils dataTypUtils = new DataTypUtils();
             for (final FormModel formModel : formModelLists) {
