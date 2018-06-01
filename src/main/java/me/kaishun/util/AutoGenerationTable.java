@@ -4,24 +4,30 @@ import java.io.*;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class AutoGenerationTable {
     public static void main(String[] args) {
+        String savePath="G:\\spark-sql-test\\create-sql\\aatable.txt";
         //文本的那些转table
-//        createTableByFile();
+//        createTableByFile(savePath);
         // hive转table
-        createTableByHive();
+        createTableByHive(savePath);
         // sqlserver转table
-        createTableBySqlserver();
+//        createTableBySqlserver(savePath);
         // mysql转table
-        creteTableByMysql();
+//        creteTableByMysql(savePath);
     }
 
-    private static void creteTableByMysql() {
+    /**
+     * 通过mysql来创建xml的table表
+     */
+    private static void creteTableByMysql(String savePath) {
         String xmlValue = "";
         xmlValue += createXmlHeard();
 
         DBHelper dbHelper = new DBHelper();
+        dbHelper.sqlserverOrMysqlOrHive = "mysql";
         dbHelper.setDBValue("root","root","111.230.28.12","STUDENT",32768);
         dbHelper.GetConn();
         String sql = "show create table STUDENT";
@@ -62,22 +68,111 @@ public class AutoGenerationTable {
             dbHelper.CloseConn();
         }
         xmlValue+=bodyBuffer.toString();
-        xmlValue+=createXmlEnd();
+        xmlValue+=createXmlEnd("","");
         System.out.println(xmlValue);
+        saveToFile(savePath,xmlValue);
 
     }
 
-    private static void createTableBySqlserver() {
+    /**
+     * 通过sqlserver来创建xml的table表
+     */
+    private static void createTableBySqlserver(String savePath) {
+        DBHelper dbHelper = new DBHelper();
+        dbHelper.sqlserverOrMysqlOrHive = "sqlserver";
+        dbHelper.setDBValue("dtauser","dtauser","192.168.1.50\\newdb","MBD2_CITY_BEIJING",0);
+        dbHelper.GetConn();
+        String sql = "SELECT syscolumns.name,systypes.name\n" +
+                "FROM syscolumns, systypes \n" +
+                "WHERE syscolumns.xusertype = systypes.xusertype \n" +
+                "AND syscolumns.id = object_id('MBD2_CITY_BEIJING.dbo.tb_evt_cell_dd_180126')";
+        ResultSet rs = dbHelper.GetResultSet(sql);
+        StringBuffer bodyBuffer = new StringBuffer();
+        try {
+            int pos = 1;
+
+            while (rs.next()){
+                String field = rs.getString(1);
+                String attr = rs.getString(2);
+                createXmlBody(bodyBuffer,field,attr,pos);
+                pos++;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        String xmlValue = "";
+        xmlValue += createXmlHeard();
+        xmlValue += bodyBuffer.toString();
+        xmlValue +=createXmlEnd("","");
+        System.out.println(xmlValue);
+        saveToFile(savePath,xmlValue);
     }
 
-    private static void createTableByHive() {
+    /**
+     * 通过hive来创建xml表
+     * @param savePath
+     */
+    private static void createTableByHive(String savePath) {
+        StringBuffer bodyBuffer = new StringBuffer();
+        String splitSgn="";
+        String location = "";
+        DBHelper dbHelper = new DBHelper();
+        dbHelper.sqlserverOrMysqlOrHive = "hive";
+        dbHelper.setDBValue("hmaster","mastercom168","192.168.1.37","default",10000);
+
+        String querySql = "show create TABLE tb_mr_cell_yd_dd_180125_2";
+        ResultSet rs = dbHelper.GetResultSet(querySql);
+        int pos = -1;
+        try {
+            while (rs.next()){
+                String line = rs.getString(1);
+                if(line.contains("(") && pos==-1){
+                    //开始
+                    pos=1;
+                    continue;
+                }
+
+                if(pos>0){
+                    String templine = line.replace("`", "").replace(",", "").replace(")","").trim();
+                    String[] split = templine.split(" ");
+                    String field = split[0];
+                    String attr = split[1];
+                    createXmlBody(bodyBuffer,field,attr,pos);
+                    pos++;
+                }
+                if(line.contains(")")&&pos>0){
+                    //读取结束
+                    pos=0;
+                }
+
+                if(line.contains("FIELDS TERMINATED BY")){
+                    splitSgn = line.replace("FIELDS TERMINATED BY", "").replace("'","").trim();
+                }
+                if(line.contains("LOCATION")){
+                    rs.next();
+                    location = rs.getString(1).replace("`","").replace("'","").trim();
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String xmlValue="";
+        xmlValue += createXmlHeard();
+        xmlValue += bodyBuffer.toString();
+        xmlValue += createXmlEnd(splitSgn,location);
+        System.out.println(xmlValue);
+        saveToFile(savePath,xmlValue);
 
     }
 
 
-    private static void createTableByFile() {
+    /**
+     * 通过createble的文件来创建xml表
+     * @param savePath
+     */
+    private static void createTableByFile(String savePath) {
         String sourcePath = "G:\\spark-sql-test\\create-sql\\aa.txt";
-        String savePath = "G:\\spark-sql-test\\create-sql\\aatable.txt";
         String xmlValue = createBySQLFile(sourcePath);
         System.out.println(xmlValue);
         saveToFile(savePath,xmlValue);
@@ -125,7 +220,7 @@ public class AutoGenerationTable {
                 }
             }
             result += bodyBuffer.toString();
-            result  += createXmlEnd();
+            result  += createXmlEnd("","");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,22 +230,45 @@ public class AutoGenerationTable {
         return result;
     }
 
+    /**
+     * 创建xml表头
+     * @return
+     */
     private static String createXmlHeard(){
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?> "+"\n"+"<table>"+"\n";
     }
+
+    /**
+     * 创建xml表body
+     * @param field
+     * @param fieldName
+     * @param type
+     * @param pos
+     * @return
+     */
     private static StringBuffer createXmlBody(StringBuffer field, String fieldName,String type, int pos){
         String model = "<fieldname fieldname=\"%1$s\" type=\"%2$s\" pos=\"%3$s\"/>";
         String body = String.format(model, fieldName, type, pos);
         field.append("    "+body).append("\n");
         return field;
     }
-    private static String createXmlEnd(){
-        String result = "    <splitsign></splitsign>"+"\n";
-        result +="    <inputPath></inputPath>"+"\n";
+
+    /**
+     * 创建xml表尾
+     * @return
+     */
+    private static String createXmlEnd(String splitsgn,String location){
+        String result = "    <splitsign>"+splitsgn+"</splitsign>"+"\n";
+        result +="    <inputPath>"+location+"</inputPath>"+"\n";
         result +="</table>";
         return result;
     }
 
+    /**
+     * 保存到文件
+     * @param path
+     * @param value
+     */
     public static void saveToFile(String path,String value){
 
         try{

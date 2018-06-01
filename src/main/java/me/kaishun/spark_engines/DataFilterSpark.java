@@ -20,7 +20,8 @@ public class DataFilterSpark {
             String FieldSplitSign = ",";
 
             SparkSession spark = SparkConfUtil.getSparkSession();
-
+            spark.sql("SELECT * FROM default.tb_high1 LIMIT 10").show();
+            System.exit(0);
             /* 加载所有的表结构 */
             final DataTypUtils dataTypUtils = new DataTypUtils();
             for (final FormModel formModel : formModelLists) {
@@ -34,7 +35,6 @@ public class DataFilterSpark {
                     if (fieldAttr.posIndex > maxSplitNum) {
                         maxSplitNum = fieldAttr.posIndex;
                     }
-
                 }
                 // sparkSql 注册表结构
                 StructType schema = DataTypes.createStructType(fields);
@@ -89,10 +89,6 @@ public class DataFilterSpark {
                 if (saveType.toLowerCase().contains("show")) {
                     results.show();
                 }
-
             }
-
         }
-
-
 }

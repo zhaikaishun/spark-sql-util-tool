@@ -8,6 +8,7 @@ public class DBHelper
     String ServerIp;
     String DbName;
     int port;
+    String sqlserverOrMysqlOrHive;
 
     public void setDBValue(String user, String pwd, String ip, String Dbname,int port)
     {
@@ -31,8 +32,21 @@ public class DBHelper
             return _CONN;
         try
         {
-            String sDriverName = "com.mysql.jdbc.Driver";
-            String sDBUrl = "jdbc:mysql://" + ServerIp +":"+port+ "/"+DbName+"?useUnicode=true&characterEncoding=utf8";
+            String sDriverName = "";
+            String sDBUrl = "";
+            if("mysql".contains(sqlserverOrMysqlOrHive.toLowerCase())){
+                sDriverName = "com.mysql.jdbc.Driver";
+                sDBUrl = "jdbc:mysql://" + ServerIp +":"+port+ "/"+DbName+"?useUnicode=true&characterEncoding=utf8";
+            }
+            else if("hive".contains(sqlserverOrMysqlOrHive.toLowerCase())){
+                sDriverName =  "org.apache.hive.jdbc.HiveDriver";
+                sDBUrl = "jdbc:hive2://"+ ServerIp +":"+port+ "/"+DbName;
+
+            }
+            else{
+                sDriverName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+                sDBUrl = "jdbc:sqlserver://" + ServerIp + ";databaseName=" + DbName;
+            }
             Class.forName(sDriverName);
             _CONN = DriverManager.getConnection(sDBUrl, sUser, sPwd);
         } catch (Exception ex)
