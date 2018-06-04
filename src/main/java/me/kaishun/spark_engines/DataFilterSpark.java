@@ -1,7 +1,9 @@
 package me.kaishun.spark_engines;
 import jline.console.ConsoleReader;
+import me.kaishun.conf.OperatorConf;
 import me.kaishun.spark_main.FieldAttr;
 import me.kaishun.spark_main.FormModel;
+import me.kaishun.spark_main.ResultsModel;
 import me.kaishun.spark_main.SparkConfUtil;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -16,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class DataFilterSpark {
 
-        public static void doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
+        public static ResultsModel doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
             String FieldSplitSign = ",";
 
             SparkSession spark = SparkConfUtil.getSparkSession();
@@ -59,34 +61,45 @@ public class DataFilterSpark {
                 // 给这种数据添加一个表名
                 dataFrame.createOrReplaceTempView(formModel.tableName);
             }
+            ArrayList<Dataset<Row>> rowDatasetLists = new ArrayList<>();
             // 注意，如果是eclipse等IDE测试，需要在VM中加  -Djline.terminal=jline.UnsupportedTerminal
-            ConsoleReader reader = new ConsoleReader();
-            while(true){
-                System.out.println("请输入sql");
-                String sqlCondition = reader.readLine("spark-sql sql> ");
-                if(sqlCondition.endsWith(";")){
-                    sqlCondition = sqlCondition.substring(0, sqlCondition.length() - 1);
+            if(OperatorConf.returnRow){
+                for (String sql : OperatorConf.sqlList) {
+                    Dataset<Row> rowDataset = spark.sql(sql);
+                    rowDatasetLists.add(rowDataset);
                 }
-                System.out.println("请输入保存方式: show, saveAsText, saveToHive, saveAsParquet");
-                String saveType = reader.readLine("spark sql type> ");
-                Dataset<Row> results = spark.sql(sqlCondition);
+                return new ResultsModel(rowDatasetLists,spark);
+            }else{
+                ConsoleReader reader = new ConsoleReader();
+                while(true){
+                    System.out.println("请输入sql");
+                    String sqlCondition = reader.readLine("spark-sql sql> ");
+                    if(sqlCondition.endsWith(";")){
+                        sqlCondition = sqlCondition.substring(0, sqlCondition.length() - 1);
+                    }
+                    System.out.println("请输入保存方式: show, saveAsText, saveToHive, saveAsParquet");
+                    String saveType = reader.readLine("spark sql type> ");
+                    Dataset<Row> results = spark.sql(sqlCondition);
 
-                if (saveType.toLowerCase().contains("saveastext")) {
-                    System.out.println("请输入路径保存");
-                    String savePath = reader.readLine("spark sql savePath> ");
-                    System.out.println("请输入保存的分割符号");
-                    String splitSng = reader.readLine("spark sql splitSng> ");
-                    SaveRddFuncUtil.saveAsTextFile(savePath,splitSng, spark, results);
+                    if (saveType.toLowerCase().contains("saveastext")) {
+                        System.out.println("请输入路径保存");
+                        String savePath = reader.readLine("spark sql savePath> ");
+                        System.out.println("请输入保存的分割符号");
+                        String splitSng = reader.readLine("spark sql splitSng> ");
+                        SaveRddFuncUtil.saveAsTextFile(savePath,splitSng, spark, results);
+                    }
+                    if (saveType.toLowerCase().contains("saveasparquet")) {
+                        SaveRddFuncUtil.saveAsQuality("path", spark, results);
+                    }
+                    if (saveType.toLowerCase().contains("savetohive")) {
+                        SaveRddFuncUtil.saveToHive("path", spark, results);
+                    }
+                    if (saveType.toLowerCase().contains("show")) {
+                        results.show();
+                    }
                 }
-                if (saveType.toLowerCase().contains("saveasparquet")) {
-                    SaveRddFuncUtil.saveAsQuality("path", spark, results);
-                }
-                if (saveType.toLowerCase().contains("savetohive")) {
-                    SaveRddFuncUtil.saveToHive("path", spark, results);
-                }
-                if (saveType.toLowerCase().contains("show")) {
-                    results.show();
-                }
+
             }
+
         }
 }

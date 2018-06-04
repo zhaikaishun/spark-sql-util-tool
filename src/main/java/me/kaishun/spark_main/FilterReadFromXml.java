@@ -37,8 +37,10 @@ public class FilterReadFromXml {
 			if (fs.isDirectory()) {
 				System.out.println(fs.getName() + " [目录]");
 			} else {
-				System.out.println(fs.getName().replace(".xml", ""));
-				arrayList.add(fs.getName().replace(".xml", ""));
+				if(fs.getName().endsWith("xml")){
+					System.out.println(fs.getName().replace(".xml", ""));
+					arrayList.add(fs.getName().replace(".xml", ""));
+				}
 			}
 		}
 		return arrayList;

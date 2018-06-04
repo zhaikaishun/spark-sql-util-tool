@@ -1,5 +1,6 @@
 package me.kaishun.spark_main;
 
+import me.kaishun.conf.OperatorConf;
 import me.kaishun.spark_engines.DataFilterSpark;
 import org.dom4j.DocumentException;
 
@@ -14,6 +15,12 @@ public class MainForm  implements java.io.Serializable{
     public static void main(String[] args) {
         FilterReadFromXml filterReadFromXml = new FilterReadFromXml();
         ArrayList<String> tableNames = filterReadFromXml.getTableName();
+        /*加载conf参数*/
+        try {
+            OperatorConf.setConfFromConfig();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         try {
             ArrayList<FormModel> formModelLists = new ArrayList<>();
             /* 把所有的表的字段说明和数据路径等存放到FormModel中 */

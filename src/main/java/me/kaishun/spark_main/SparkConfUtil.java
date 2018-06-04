@@ -17,14 +17,14 @@ public class SparkConfUtil {
             spark = SparkSession
                     .builder()
                     .appName("spark-sql-tool").master("local")
-                    .enableHiveSupport()
+//                    .enableHiveSupport()
                     .config(sparkConf)
                     .getOrCreate();
         }else{
             spark = SparkSession
                     .builder()
                     .appName("spark-sql-tool")
-                    .enableHiveSupport()
+//                    .enableHiveSupport()
                     .getOrCreate();
         }
         // 设置log级别
