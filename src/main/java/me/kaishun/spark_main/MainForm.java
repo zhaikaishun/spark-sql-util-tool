@@ -13,6 +13,10 @@ public class MainForm  implements java.io.Serializable{
      * @throws DocumentException
      */
     public static void main(String[] args) {
+        GetRowResults(args);
+    }
+
+    private static ResultsModel GetRowResults(String[] args) {
         FilterReadFromXml filterReadFromXml = new FilterReadFromXml();
         ArrayList<String> tableNames = filterReadFromXml.getTableName();
         /*加载conf参数*/
@@ -30,10 +34,12 @@ public class MainForm  implements java.io.Serializable{
             }
             DataFilterSpark dataFilterSpark = new DataFilterSpark();
             // spark sql核心代码
-            dataFilterSpark.doSpark(formModelLists,args);
+            ResultsModel resultsModel = dataFilterSpark.doSpark(formModelLists, args);
+            return resultsModel;
 
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
     }
 }
