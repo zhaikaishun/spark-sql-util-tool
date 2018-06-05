@@ -38,26 +38,40 @@ public class DataFilterSpark {
                 }
                 // sparkSql 注册表结构
                 StructType schema = DataTypes.createStructType(fields);
-                final String splitsign = FieldSplitSign;
+                final String splitsign = formModel.splitSign;
                 // 最大分割数final一下
                 final int maxClosePackageSplitNum = maxSplitNum;
                 /* 根据表结构加载数据 */
                 JavaRDD<Row> rowRDD = people.map(new Function<String, Row>() {
                     public Row call(String record) throws Exception {
-                        String[] splits = record.split(splitsign, maxClosePackageSplitNum + 2);
-                        Object[] objeck = new Object[splits.length];
-                        if (splits.length <= formModel.fieldAttrArrayList.size()) {
+                        try{
+                            String[] splits = record.split(splitsign, maxClosePackageSplitNum + 2);
+                            Object[] objeck = new Object[splits.length];
                             for (int i = 0; i < formModel.fieldAttrArrayList.size(); i++) {
                                 FieldAttr eachFieldAttr = formModel.fieldAttrArrayList.get(i);
                                 objeck[i] = dataTypUtils.arrtToObject(splits[eachFieldAttr.posIndex - 1].trim(),
                                         eachFieldAttr.attribute);
                             }
+                            return RowFactory.create(objeck);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            return null;
                         }
-                        return RowFactory.create(objeck);
                     }
                 });
+                JavaRDD<Row> filterRDD = rowRDD.filter(new Function<Row, Boolean>() {
+                    @Override
+                    public Boolean call(Row row) throws Exception {
+                        if (row != null) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+
                 // 根据表数据和表结构，注册DataSet
-                Dataset<Row> dataFrame = spark.createDataFrame(rowRDD, schema);
+                Dataset<Row> dataFrame = spark.createDataFrame(filterRDD, schema);
                 // 给这种数据添加一个表名
                 dataFrame.createOrReplaceTempView(formModel.tableName);
             }
