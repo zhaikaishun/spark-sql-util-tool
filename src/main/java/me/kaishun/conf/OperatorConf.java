@@ -6,13 +6,11 @@ import java.util.HashMap;
 import java.util.Properties;
 
 public class OperatorConf {
-    public static HashMap<String,Boolean> operatorMap = new HashMap<>();
-
-    //是否返回row
-    public static final String IFRETURNROW = "ifreturnrow";
-    public static final String SQL_CHAIN="sql.chain";
-    public static ArrayList<String> sqlList = new ArrayList<>();
+    // sql的列表
     public static boolean returnRow = false;
+    public static ArrayList<String> sqlList = new ArrayList<>();
+    public static ArrayList<String> operatorList = new ArrayList<>();
+
     public static void setConfFromConfig() throws Exception {
         String path = "conf_table/operator.conf"; // 路径
         Properties prop = new Properties();
@@ -22,22 +20,23 @@ public class OperatorConf {
             prop.load(in);
             in.close();
         }
-        String rowInterface = (String) prop.get(IFRETURNROW);
-        if(rowInterface!=null && rowInterface.toLowerCase().contains("yes")||rowInterface.contains("true")){
-            returnRow = true;
-        }
-        String chain = (String) prop.get(SQL_CHAIN);
-        if(chain==null){
-            return;
-        }
-        String[] sqlIndexArrays = chain.split(",");
+        returnRow = Boolean.parseBoolean(prop.getProperty("ifreturnrow", "false"));
 
+        String sqlchain = (String) prop.get("sql.chain");
+        String[] sqlIndexArrays = sqlchain.split("###");
         for (String sqlIndexList : sqlIndexArrays) {
             String sql = prop.getProperty(sqlIndexList.trim()).replace(";","");
             if(sql!=null){
                 sqlList.add(sql);
             }
         }
+        String operatorChain = (String) prop.get("operator.chain");
+        String[] operatorArray = operatorChain.split("###");
+        for (String operatorStr : operatorArray) {
+            operatorList.add(operatorStr);
+        }
+
+
 
     }
 

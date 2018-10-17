@@ -16,7 +16,7 @@ public class MainForm  implements java.io.Serializable{
         GetRowResults(args);
     }
 
-    private static ResultsModel GetRowResults(String[] args) {
+    public static ResultsModel GetRowResults(String[] args) {
         FilterReadFromXml filterReadFromXml = new FilterReadFromXml();
         ArrayList<String> tableNames = filterReadFromXml.getTableName();
         /*加载conf参数*/

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class DataFilterSpark {
 
-        public static ResultsModel doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
+        public ResultsModel doSpark(ArrayList<FormModel> formModelLists, String[] args) throws Exception {
             String FieldSplitSign = ",";
 
             SparkSession spark = SparkConfUtil.getSparkSession();
@@ -78,9 +78,21 @@ public class DataFilterSpark {
             ArrayList<Dataset<Row>> rowDatasetLists = new ArrayList<>();
             // 注意，如果是eclipse等IDE测试，需要在VM中加  -Djline.terminal=jline.UnsupportedTerminal
             if(OperatorConf.returnRow){
-                for (String sql : OperatorConf.sqlList) {
+
+                for (int i = 0; i < OperatorConf.sqlList.size(); i++) {
+                    String sql = OperatorConf.sqlList.get(i);
                     Dataset<Row> rowDataset = spark.sql(sql);
-                    rowDatasetLists.add(rowDataset);
+                    String operator = OperatorConf.operatorList.get(i);
+                    String splitSng = "|";
+                    if (operator.contains("save")){
+                        String[] opLists = operator.split("&&");
+                        String operatorSavePath = opLists[0].replace("save:","");
+                        splitSng = opLists[0].replace("splitSng:","");
+                        SaveRddFuncUtil.saveAsTextFile(operatorSavePath,splitSng, spark, rowDataset);
+                    }
+                    if(operator.contains("return")){
+                        rowDatasetLists.add(rowDataset);
+                    }
                 }
                 return new ResultsModel(rowDatasetLists,spark);
             }else{

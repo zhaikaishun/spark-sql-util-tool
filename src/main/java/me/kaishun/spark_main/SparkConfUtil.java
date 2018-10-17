@@ -17,7 +17,7 @@ public class SparkConfUtil {
             spark = SparkSession
                     .builder()
                     .appName("spark-sql-tool").master("local")
-//                    .enableHiveSupport()
+                    .enableHiveSupport()
                     .config(sparkConf)
                     .getOrCreate();
         }else{
