@@ -80,7 +80,7 @@ public class AutoGenerationTable {
     private static void createTableBySqlserver(String savePath) {
         DBHelper dbHelper = new DBHelper();
         dbHelper.sqlserverOrMysqlOrHive = "sqlserver";
-        dbHelper.setDBValue("dtauser","dtauser","192.168.1.50\\newdb","MBD2_CITY_BEIJING",0);
+        dbHelper.setDBValue("user","passed","ip","MBD2_CITY_BEIJING",0);
         dbHelper.GetConn();
         String sql = "SELECT syscolumns.name,systypes.name\n" +
                 "FROM syscolumns, systypes \n" +
