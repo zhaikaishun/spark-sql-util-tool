@@ -28,7 +28,7 @@ public class AutoGenerationTable {
 
         DBHelper dbHelper = new DBHelper();
         dbHelper.sqlserverOrMysqlOrHive = "mysql";
-        dbHelper.setDBValue("root","root","111.230.28.12","STUDENT",32768);
+        dbHelper.setDBValue("user","passwd","192.168.x.xx","STUDENT",3306);
         dbHelper.GetConn();
         String sql = "show create table STUDENT";
         ResultSet rs = dbHelper.GetResultSet(sql);
@@ -118,7 +118,7 @@ public class AutoGenerationTable {
         String location = "";
         DBHelper dbHelper = new DBHelper();
         dbHelper.sqlserverOrMysqlOrHive = "hive";
-        dbHelper.setDBValue("hmaster","mastercom168","192.168.1.37","default",10000);
+        dbHelper.setDBValue("user","passed","192.168.xx.xx","default",10000);
 
         String querySql = "show create TABLE tb_mr_cell_yd_dd_180125_2";
         ResultSet rs = dbHelper.GetResultSet(querySql);
